@@ -35,11 +35,11 @@ public class Asignacion_servicio {
 	@ManyToOne
 	@JoinColumn(name = "empleado_id", nullable = false)
 	private Empleado empleado;
+	
+	@ManyToOne
+	@JoinColumn(name = "solicitud_id", nullable = false)
+	private Solicitud_presupuesto solicitud;
 
-	// Campo fecha que se asigna automáticamente cuando se crea el registro
-	@CreationTimestamp
-	@Column(name = "fecha_asignacion", nullable = false, updatable = false)
-	private LocalDateTime fechaAsignacion;
 
 	// Rol que desempeña el empleado
 	private String rol;

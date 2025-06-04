@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class EmpleadoServicio {
@@ -40,10 +41,10 @@ public class EmpleadoServicio {
     }
 
     // Read by Id
-    public Empleado findbyId(Long id) {
-        return empleadoRepositorio.findById(id)
-            .orElseThrow(() -> new EmpleadoNoEncontradoException("Empleado no encontrado con ID: " + id));
+    public Optional<Empleado> findById(Long id) {
+        return empleadoRepositorio.findById(id);
     }
+
 
     // Delete
     @Transactional

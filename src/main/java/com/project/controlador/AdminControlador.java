@@ -1,6 +1,7 @@
 package com.project.controlador;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.dto.AsignacionEmpleadoDTO;
+import com.project.dto.Solicitudes_presupuestoDTO;
+import com.project.modelo.Asignacion_servicio;
+import com.project.modelo.Empleado;
 import com.project.modelo.Solicitud_presupuesto;
 import com.project.modelo.Usuario;
+import com.project.servicio.AsignacionServicioServicio;
+import com.project.servicio.EmpleadoServicio;
 import com.project.servicio.Solicitud_presupuestoServicio;
 import com.project.servicio.UsuarioServicio;
 
@@ -32,6 +39,12 @@ public class AdminControlador {
 
 	@Autowired
 	private UsuarioServicio usuarioservicio;
+
+	@Autowired
+	private AsignacionServicioServicio asignacionServicio;
+
+	@Autowired
+	private EmpleadoServicio empleadoServicio;
 
 	@PostMapping
 	public ResponseEntity<Solicitud_presupuesto> crearSolicitud(@RequestBody Solicitud_presupuesto solicitud,
@@ -52,8 +65,25 @@ public class AdminControlador {
 
 	// Listar todas las solicitudes
 	@GetMapping
-	public List<Solicitud_presupuesto> listarSolicitudes() {
-		return solicitudServicio.listarTodas();
+	public List<Solicitudes_presupuestoDTO> listarSolicitudes() {
+		List<Solicitud_presupuesto> solicitudes = solicitudServicio.listarTodas();
+		List<Solicitudes_presupuestoDTO> dtos = new ArrayList<>();
+
+		for (Solicitud_presupuesto s : solicitudes) {
+			Solicitudes_presupuestoDTO dto = new Solicitudes_presupuestoDTO();
+			dto.setSolicitudId(s.getId_solicitudes_presupuesto());
+			dto.setEstado(s.getEstado());
+			dto.setDetalles(s.getDetalles());
+			dto.setDireccion(s.getDireccion());
+			if (s.getUsuario() != null) {
+				dto.setCorreo(s.getUsuario().getCorreo());
+			} else {
+				dto.setCorreo("Desconocido");
+			}
+			dtos.add(dto);
+		}
+
+		return dtos;
 	}
 
 	@GetMapping("/{id}")
@@ -88,10 +118,35 @@ public class AdminControlador {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> eliminarSolicitud(@PathVariable Long id) {
 		if (solicitudServicio.buscarPorId(id).isPresent()) {
+
+			List<Asignacion_servicio> asignaciones = asignacionServicio.findBySolicitudId(id);
+
+			if (asignaciones != null && !asignaciones.isEmpty()) {
+				asignacionServicio.eliminarTodas(asignaciones);
+			}
 			solicitudServicio.eliminar(id);
 			return ResponseEntity.noContent().build();
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+
+	@PostMapping("/asignar-empleado")
+	public ResponseEntity<?> asignarEmpleado(@RequestBody AsignacionEmpleadoDTO dto) {
+		Optional<Solicitud_presupuesto> solicitud = solicitudServicio.buscarPorId(dto.getSolicitudId());
+		Optional<Empleado> empleado = empleadoServicio.findById(dto.getEmpleadoId());
+
+		if (solicitud.isEmpty() || empleado.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Solicitud o Empleado no encontrados");
+		}
+
+		Asignacion_servicio asignacion = new Asignacion_servicio();
+		asignacion.setSolicitud(solicitud.get());
+		asignacion.setEmpleado(empleado.get());
+		asignacion.setRol(dto.getRol());
+
+		asignacionServicio.asignarEmpleadoASolicitud(asignacion);
+
+		return ResponseEntity.ok("Empleado asignado correctamente a la solicitud");
 	}
 }

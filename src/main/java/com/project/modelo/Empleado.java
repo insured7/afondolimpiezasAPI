@@ -64,4 +64,9 @@ public class Empleado {
 	@OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Asignacion_servicio> asignaciones;
 
+	public boolean isEmpty() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

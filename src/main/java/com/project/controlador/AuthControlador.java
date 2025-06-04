@@ -17,11 +17,15 @@ import com.project.dto.AuthResponse;
 import com.project.dto.AuthResponseAdmin;
 import com.project.dto.RegistroEmpleadoDTO;
 import com.project.dto.RegistroUsuarioDTO;
+import com.project.dto.SesionRequest;
 import com.project.modelo.Empleado;
 import com.project.modelo.Usuario;
 import com.project.repositorio.UsuarioRepositorio;
 import com.project.servicio.AuthServicio;
 import com.project.servicio.UsuarioServicio;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Controlador de autenticación y registro
@@ -42,6 +46,8 @@ public class AuthControlador {
 
 	// ========== LOGIN ENDPOINTS ==========
 
+	
+	
 	@PostMapping("/login-usuario")
 	public ResponseEntity<?> loginUsuario(@RequestBody AuthRequest request) {
 		try {
@@ -128,7 +134,7 @@ public class AuthControlador {
 	            "redirect", "http://localhost:3000/frontAFondoLimpiezas/login.jsp"
 	        ));
 	    } catch (Exception e) {
-	        // Mensaje de error más claro
+	        
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
 	            "mensaje", "Error al activar cuenta: " + e.getMessage(),
 	            "tokenExpirado", e.getMessage().toLowerCase().contains("expirado")

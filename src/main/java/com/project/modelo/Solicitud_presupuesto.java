@@ -41,7 +41,7 @@ public class Solicitud_presupuesto {
 
     private String detalles;
 
-    private String estado;
+    private String estado = "pendiente";
     
     private String direccion;
 

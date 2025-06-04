@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.project.modelo.Asignacion_servicio;
 import com.project.modelo.Empleado;
+import com.project.modelo.Solicitud_presupuesto;
 import com.project.repositorio.AsignacionServicioRepositorio;
 import com.project.repositorio.EmpleadoRepositorio;
+import com.project.repositorio.Solicitud_presupuestoRepositorio;
 
 @Service
 public class AsignacionServicioServicio {
@@ -18,19 +20,24 @@ public class AsignacionServicioServicio {
 
 	@Autowired
 	private EmpleadoRepositorio empleadoRepo;
+	
+	@Autowired
+	private Solicitud_presupuestoServicio solicitudServicio;
 
 	// Asigna un empleado a un servicio con un rol determinado
-	public Asignacion_servicio asignarEmpleado(Long empleadoId, String rol) {
-		
-		Empleado empleado = empleadoRepo.findById(empleadoId)
-				.orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+	public Asignacion_servicio asignarEmpleadoASolicitud(Asignacion_servicio asignacion) {
+	    Empleado empleado = empleadoRepo.findById(asignacion.getEmpleado().getId_empleado())
+	        .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
 
-		Asignacion_servicio asignacion = new Asignacion_servicio();
-		asignacion.setEmpleado(empleado);
-		asignacion.setRol(rol);
+	    Solicitud_presupuesto solicitud = solicitudServicio.buscarPorId(asignacion.getSolicitud().getId_solicitudes_presupuesto())
+	        .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
 
-		return asignacionRepo.save(asignacion);
+	    asignacion.setEmpleado(empleado);
+	    asignacion.setSolicitud(solicitud);
+
+	    return asignacionRepo.save(asignacion);
 	}
+
 
 	// Devuelve todas las asignaciones
 	public List<Asignacion_servicio> obtenerTodasAsignaciones() {
@@ -59,5 +66,19 @@ public class AsignacionServicioServicio {
 		asignacion.setRol(nuevoRol);
 		return asignacionRepo.save(asignacion);
 	}
+	
+	public List<Asignacion_servicio> findBySolicitudId(Long solicitudId) {
+	    // Primero buscas la solicitud (puedes usar solicitudServicio)
+	    Solicitud_presupuesto solicitud = solicitudServicio.buscarPorId(solicitudId)
+	            .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
+	    // Luego buscas las asignaciones por solicitud
+	    return asignacionRepo.findBySolicitud(solicitud);
+	}
+	
+	public void eliminarTodas(List<Asignacion_servicio> asignaciones) {
+	    asignacionRepo.deleteAll(asignaciones);
+	}
+
+
 
 }

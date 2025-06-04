@@ -1,5 +1,8 @@
 package com.project.servicio;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +16,10 @@ import com.project.modelo.Usuario;
 import com.project.repositorio.EmpleadoRepositorio;
 import com.project.repositorio.UsuarioRepositorio;
 import com.project.util.JwtUtil;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 /**
  * Servicio de autenticación y registro Maneja login, registro y validaciones de
@@ -152,5 +159,6 @@ public class AuthServicio {
 		return empRep.findByCorreo(correo)
 				.orElseThrow(() -> new Exception("Empleado no encontrado con correo: " + correo));
 	}
+
 
 }

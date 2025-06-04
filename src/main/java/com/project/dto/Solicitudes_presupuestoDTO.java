@@ -11,10 +11,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Solicitudes_presupuestoDTO {
 
+	private Long solicitudId;
 	private String detalles;
-    private String estado;
+    private String estado = "pendiente";
     private String direccion;
     private Long usuarioId;
+    private String correo;
+    
     
 
 }

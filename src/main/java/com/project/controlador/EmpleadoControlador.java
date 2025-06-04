@@ -2,6 +2,7 @@ package com.project.controlador;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,8 @@ public class EmpleadoControlador {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Empleado> obtenerEmpleado(@PathVariable Long id) {
-		return ResponseEntity.ok(empleadoServicio.findbyId(id));
+	public ResponseEntity<Optional<Empleado>> obtenerEmpleado(@PathVariable Long id) {
+		return ResponseEntity.ok(empleadoServicio.findById(id));
 	}
 
 	@DeleteMapping("/{id}")

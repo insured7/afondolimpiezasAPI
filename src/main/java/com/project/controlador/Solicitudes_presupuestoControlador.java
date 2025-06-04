@@ -16,6 +16,10 @@ import com.project.modelo.Solicitud_presupuesto;
 import com.project.modelo.Usuario;
 import com.project.repositorio.UsuarioRepositorio;
 import com.project.servicio.Solicitud_presupuestoServicio;
+import com.project.util.JwtUtil;
+
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/solicitudes")
@@ -34,18 +38,32 @@ public class Solicitudes_presupuestoControlador {
 	}
 
 	@PostMapping
-	public ResponseEntity<Solicitud_presupuesto> crear(@RequestBody Solicitudes_presupuestoDTO solicitudDTO) {
-		// Buscar el usuario por ID
-		Usuario usuario = usuarioRepositorio.findById(solicitudDTO.getUsuarioId())
-				.orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+	public ResponseEntity<Solicitud_presupuesto> crear(@RequestBody Solicitudes_presupuestoDTO solicitudDTO, HttpServletRequest request) {
+	    // 1. Obtener token del encabezado Authorization
+	    String authHeader = request.getHeader("Authorization");
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
 
-		// Construir la solicitud real
-		Solicitud_presupuesto solicitud = new Solicitud_presupuesto();
-		solicitud.setDetalles(solicitudDTO.getDetalles());
-		solicitud.setEstado(solicitudDTO.getEstado());
-		solicitud.setDireccion(solicitudDTO.getDireccion());
-		;
-		solicitud.setUsuario(usuario);
-		return ResponseEntity.ok(solicitudPresu.guardar(solicitud));
+	    String token = authHeader.substring(7); // Elimina "Bearer "
+
+	    // 2. Extraer el correo desde el token
+	    Claims claims = JwtUtil.extractClaims(token);
+	    String correo = claims.getSubject(); // Este es el correo que se usó al generar el token
+
+	    // 3. Buscar el usuario autenticado por su correo
+	    Usuario usuario = usuarioRepositorio.findByCorreo(correo)
+	            .orElseThrow(() -> new RuntimeException("Usuario no encontrado con correo: " + correo));
+
+	    // 4. Crear la solicitud con ese usuario
+	    Solicitud_presupuesto solicitud = new Solicitud_presupuesto();
+	    solicitud.setDetalles(solicitudDTO.getDetalles());
+	    solicitud.setEstado(solicitudDTO.getEstado());
+	    solicitud.setDireccion(solicitudDTO.getDireccion());
+	    solicitud.setUsuario(usuario);
+
+	    return ResponseEntity.ok(solicitudPresu.guardar(solicitud));
 	}
-}
+
+	}
+

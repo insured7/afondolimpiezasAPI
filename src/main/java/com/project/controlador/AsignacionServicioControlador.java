@@ -23,12 +23,15 @@ public class AsignacionServicioControlador {
 	@Autowired
 	private AsignacionServicioServicio asignacionServicio;
 
-	// Crear una nueva asignación de empleado a servicio con rol
-	@PostMapping("/asignar")
-	public ResponseEntity<Asignacion_servicio> asignarEmpleado(	@RequestParam Long empleadoId, @RequestParam String rol) {
-		Asignacion_servicio nuevaAsignacion = asignacionServicio.asignarEmpleado(empleadoId, rol);
-		return ResponseEntity.ok(nuevaAsignacion);
-	}
+	/*
+	 * // Crear una nueva asignación de empleado a servicio con rol
+	 * 
+	 * @PostMapping("/asignar") public ResponseEntity<Asignacion_servicio>
+	 * asignarEmpleado( @RequestParam Long empleadoId, @RequestParam Long
+	 * solicitudId, @RequestParam String rol) { Asignacion_servicio nuevaAsignacion
+	 * = asignacionServicio.asignarEmpleadoASolicitud(empleadoId,solicitudId, rol);
+	 * return ResponseEntity.ok(nuevaAsignacion); }
+	 */
 
 	// Obtener todas las asignaciones
 	@GetMapping

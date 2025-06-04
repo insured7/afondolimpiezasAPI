@@ -15,5 +15,6 @@ import com.project.modelo.Usuario;
 public interface EmpleadoRepositorio extends JpaRepository<Empleado, Long> {
 	
 	Optional<Empleado> findByCorreo(String email);
+	Optional<Empleado> findById(Long id);
 
 }
